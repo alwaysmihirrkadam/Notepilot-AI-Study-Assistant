@@ -10,11 +10,12 @@ const Navbar = ({ setSidebarOpen }) => {
   const [user, setUser] = useState([])
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const userDetails = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/auth/userDetails", {
+      const res = await axios.get(`${API_URL}/api/auth/userDetails`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

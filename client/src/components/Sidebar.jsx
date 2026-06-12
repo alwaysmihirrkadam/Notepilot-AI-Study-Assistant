@@ -8,13 +8,14 @@ import { toast } from "react-toastify";
 const Sidebar = ({ selectedDocument, setSelectedDocument, sidebarOpen, setSidebarOpen }) => {
   const [documents, setDocuments] = useState([]);
   const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const getDocuments = async () => {
     try {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        "http://localhost:5000/api/documents",
+        `${API_URL}/api/documents`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -43,7 +44,7 @@ const Sidebar = ({ selectedDocument, setSelectedDocument, sidebarOpen, setSideba
       const token = localStorage.getItem("token");
 
       await axios.delete(
-        `http://localhost:5000/api/documents/${documentId}`,
+        `${API_URL}/api/documents/${documentId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

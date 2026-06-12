@@ -9,6 +9,7 @@ const UploadPDF = () => {
   const [currentFile, setCurrentFile] = useState("");
   const [uploadedCount, setUploadedCount] = useState(0);
   const [seconds, setSeconds] = useState(0);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const navigate = useNavigate();
 
@@ -51,7 +52,7 @@ const UploadPDF = () => {
         formData.append("pdf", file);
 
         await axios.post(
-          "http://localhost:5000/api/pdf/upload",
+          `${API_URL}/api/pdf/upload`,
           formData,
           {
             headers: {

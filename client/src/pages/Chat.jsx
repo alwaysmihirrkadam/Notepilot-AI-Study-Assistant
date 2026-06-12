@@ -7,8 +7,7 @@ import MessageArea from "../components/MessageArea";
 import ChatInput from "../components/ChatInput";
 import { toast } from "react-toastify";
 import { FiMenu } from "react-icons/fi";
-
-const Chat = ({sidebarOpen, setSidebarOpen}) => {
+const Chat = ({ sidebarOpen, setSidebarOpen }) => {
   const navigate = useNavigate();
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState([]);
@@ -20,6 +19,7 @@ const Chat = ({sidebarOpen, setSidebarOpen}) => {
       )
     ) || null
   );
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const token =
@@ -52,7 +52,7 @@ const Chat = ({sidebarOpen, setSidebarOpen}) => {
       setLoading(true);
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        "http://localhost:5000/api/chat",
+        `${API_URL}/api/chat`,
         {
           question: currentQuestion,
           documentId:

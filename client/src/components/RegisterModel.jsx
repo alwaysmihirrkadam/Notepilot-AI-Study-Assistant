@@ -6,11 +6,12 @@ import { toast } from "react-toastify";
 const RegisterModal = () => {
     const [registerForm, setRegisterForm] = useState({ name: "", email: "", password: "" });
     const navigate = useNavigate()
+    const API_URL = import.meta.env.VITE_API_URL;
 
     const registerHandler = async () => {
         try {
             // Fixed: Removed the outer curly braces around loginForm
-            const res = await axios.post("http://localhost:5000/api/auth/register", registerForm);
+            const res = await axios.post(`${API_URL}/api/auth/register`, registerForm);
             localStorage.setItem("token", res.data.token);
             toast.success("Log in successfully");
             navigate("/upload");
