@@ -11,7 +11,7 @@ const LoginModal = () => {
   const loginHandler = async () => {
     try {
       // Fixed: Removed the outer curly braces around loginForm
-      const res = await axios.post(`${API_URL}/api/auth/login`, loginForm);
+      const res = await axios.post(`https://notepilot-ai-study-assistant-1.onrender.com/api/auth/login`, loginForm);
       localStorage.setItem("token", res.data.token);
       toast.success("Log in successfully");
       navigate("/upload"); 
