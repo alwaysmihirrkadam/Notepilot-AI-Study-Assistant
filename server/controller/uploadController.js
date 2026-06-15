@@ -46,6 +46,7 @@ export const uploadPDF = async (req, res) => {
     const collection =
       await client.getOrCreateCollection({
         name: "study-notes",
+        embeddingFunction: null,
       });
     const userId = req.user.id;
     const filename = req.file.originalname;
@@ -92,11 +93,11 @@ export const uploadPDF = async (req, res) => {
     });
 
   } catch (error) {
-  console.error(error);
+    console.error(error);
 
-  return res.status(500).json({
-    success: false,
-    error: error.message,
-  });
-}
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
 };
