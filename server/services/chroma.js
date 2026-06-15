@@ -1,7 +1,8 @@
 import { ChromaClient } from "chromadb";
 
 const client = new ChromaClient({
-  path: process.env.CHROMA_URL,
+  host: process.env.CHROMA_HOST,
+  ssl: true,
 });
 
 export default client;
