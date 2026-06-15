@@ -46,8 +46,10 @@ export const uploadPDF = async (req, res) => {
     const collection =
       await client.getOrCreateCollection({
         name: "study-notes",
-        embeddingFunction: null,
+        metadata: {},
       });
+
+
     const userId = req.user.id;
     const filename = req.file.originalname;
 
