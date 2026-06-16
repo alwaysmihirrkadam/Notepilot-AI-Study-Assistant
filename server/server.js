@@ -39,7 +39,7 @@ app.use(
 );
 
 // Handling preflight requests globally
-app.options("*", cors());
+app.options(/(.*)/, cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
