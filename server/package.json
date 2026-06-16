@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
     "dev": "nodemon server.js"
   },
   "keywords": [],
@@ -16,7 +17,6 @@
     "@google/genai": "^2.8.0",
     "@google/generative-ai": "^0.24.1",
     "@langchain/textsplitters": "^1.0.1",
-    "@pinecone-database/pinecone": "^7.2.0",
     "@xenova/transformers": "^2.17.2",
     "axios": "^1.17.0",
     "bcryptjs": "^3.0.3",
@@ -32,7 +32,6 @@
     "mongoose": "^9.6.3",
     "multer": "^2.1.1",
     "nodemon": "^3.1.14",
-    "openai": "^6.42.0",
     "pdf-parse": "^2.4.5",
     "pdf-parse-fork": "^1.2.0",
     "transformers": "^3.1.0"

@@ -6,44 +6,75 @@ import uploadRoutes from './routes/uploadRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import documentRoutes from './routes/documentRoutes.js';
 import userRoute from './routes/userRoute.js';
+import client from "./services/chroma.js";
 
 dotenv.config();
 
 const app = express();
 
+// Allowed origins for CORS configuration
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://notepilot-free-ai-study-assistant-460sx42da.vercel.app"
+];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://notepilot-free-ai-study-assistant-460sx42da.vercel.app",
-    ],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, or server-to-server)
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Blocked by CORS policy"));
+      }
+    },
     credentials: true,
   })
 );
+
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send("API Running");
+  res.send("NotePilot API Running Successfully");
 });
 
+app.get("/test-chroma", async (req, res) => {
+  try {
+    const collection = await client.getOrCreateCollection({
+      name: "test",
+    });
+
+    res.json({
+      success: true,
+      collection,
+    });
+  } catch (err) {
+    console.error(err);
+    res.json({
+      success: false,
+      error: err.message,
+      stack: err.stack,
+    });
+  }
+});
 
 app.use("/api/pdf", uploadRoutes);
 app.use("/api/chat", chatRoutes);
-app.use("/api/documents",documentRoutes);
+app.use("/api/documents", documentRoutes);
 app.use("/api/auth", userRoute);
 
-const port = process.env.PORT;
+// Render automatically injects process.env.PORT, fallback to 10000 locally if not set
+const port = process.env.PORT || 10000;
 
+const startServer = async () => {
+  try {
+    await connectDB();
+    app.listen(port, () => {
+      console.log(`Server running securely on port ${port}`);
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error);
+  }
+};
 
-const startServer = () => {
-    try {
-        connectDB()
-        app.listen(port, () => {
-            console.log(`Example app listening on port ${port}`)
-        })
-    } catch (error) {
-        console.log(error)
-    }
-}
-
-startServer()
+startServer();
