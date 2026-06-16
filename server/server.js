@@ -6,7 +6,6 @@ import uploadRoutes from './routes/uploadRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import documentRoutes from './routes/documentRoutes.js';
 import userRoute from './routes/userRoute.js';
-import client from "./services/chroma.js";
 
 dotenv.config();
 
@@ -36,26 +35,6 @@ app.use(express.json());
 
 app.get("/", (req, res) => {
   res.send("NotePilot API Running Successfully");
-});
-
-app.get("/test-chroma", async (req, res) => {
-  try {
-    const collection = await client.getOrCreateCollection({
-      name: "test",
-    });
-
-    res.json({
-      success: true,
-      collection,
-    });
-  } catch (err) {
-    console.error(err);
-    res.json({
-      success: false,
-      error: err.message,
-      stack: err.stack,
-    });
-  }
 });
 
 app.use("/api/pdf", uploadRoutes);

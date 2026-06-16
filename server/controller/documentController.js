@@ -1,5 +1,5 @@
 import Document from "../models/Document.js";
-import client from "../services/chroma.js";
+import client from "../services/pinecone.js";
 import cloudinary from "../services/cloudinary.js";
 
 export const getDocuments = async (req, res) => {

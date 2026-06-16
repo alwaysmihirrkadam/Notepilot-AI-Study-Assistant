@@ -1,98 +1,40 @@
-import client from "../services/chroma.js";
-import { generateEmbedding } from "../services/embeddingService.js";
-import genAI from "../services/gemini.js";
+import { GoogleGenAI } from "@google/genai";
+import Document from "../models/Document.js";
 
-export const askQuestion = async (req, res) => {
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+export const askDocumentQuestion = async (req, res) => {
   try {
-    const { question, documentId } = req.body;
-    if (!question || !documentId) {
-      return res.status(400).json({
-        success: false,
-        message: "Question and documentId are required",
-      });
+    const { documentId, question } = req.body;
+
+    // 1. Fetch the full original extracted text straight out of MongoDB
+    const doc = await Document.findOne({ documentId });
+    if (!doc) {
+      return res.status(404).json({ success: false, error: "Document not found" });
     }
 
-    const collection = await client.getCollection({
-      name: "study-notes",
+    // 2. Build a prompt context injection payload for Gemini
+    const systemPrompt = `You are an expert study assistant. Answer the user's question using only the provided document text context below. If the answer cannot be found in the context, politely state that it isn't mentioned.
+    
+    --- START OF DOCUMENT CONTEXT ---
+    ${doc.extractedText}
+    --- END OF DOCUMENT CONTEXT ---`;
+
+    // 3. Request content generation natively from Gemini 
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash", // Excellent for long contextual understanding
+      contents: [
+        { role: "user", parts: [{ text: `${systemPrompt}\n\nQuestion: ${question}` }] }
+      ]
     });
-
-    const questionEmbedding = await generateEmbedding(question);
-
-
-    // TEMPORARY: QUERY WITHOUT FILTER
-    const results =
-      await collection.query({
-        queryEmbeddings: [
-          questionEmbedding,
-        ],
-        nResults: 3,
-        where: {
-          documentId,
-        },
-      });
-
-    if (
-      !results.documents ||
-      !results.documents[0] ||
-      results.documents[0].length === 0
-    ) {
-      return res.status(404).json({
-        success: false,
-        message:
-          "No relevant content found",
-      });
-    }
-
-    const context =
-      results.documents[0].join(
-        "\n\n"
-      );
-
-    const model =
-      genAI.getGenerativeModel({
-        model: "gemini-2.5-flash",
-      });
-    const prompt = `
-You are a study assistant.
-
-Use ONLY the provided context.
-
-If the answer is not present in the context,
-say:
-
-"I could not find that information in the uploaded document."
-
-Context:
-${context}
-
-Question:
-${question}
-`;
-
-    const response = await model.generateContent(prompt);
-
-    const answer = response.response.text();
 
     return res.status(200).json({
       success: true,
-      answer,
-      sources: results.documents[0].map(
-        (doc, index) => ({
-          text: doc,
-          metadata:
-            results.metadatas?.[0]?.[
-            index
-            ] || {},
-        })
-      ),
+      answer: response.text
     });
 
   } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({
-      success: false,
-      error: error.message,
-    });
+    console.error("❌ Chat Controller Error:", error);
+    return res.status(500).json({ success: false, error: error.message });
   }
 };
