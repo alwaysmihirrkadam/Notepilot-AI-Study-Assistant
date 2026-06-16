@@ -12,31 +12,40 @@ dotenv.config();
 // 🔥 CRITICAL FIX: Initialize your Express application here!
 const app = express();
 
-// Configure CORS to trust your deployed Vercel frontend
+
 const allowedOrigins = [
-  "http://localhost:5173", // Your local Vite dev environment
-  "http://localhost:3000", // Alternative local dev port fallback
-  "https://notepilot-ai-study-assistant.vercel.app" // 🔥 Your official live Vercel frontend
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://notepilot-ai-study-assistant.vercel.app"
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps, Postman, or curl)
+      // 1. Allow requests with no origin (like mobile apps or Postman)
       if (!origin) return callback(null, true);
       
+      // 2. Allow if it matches our exact hardcoded production origins list
       if (allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        console.log(`⚠️ Blocked by CORS: ${origin}`);
-        callback(new Error("Not allowed by CORS"));
+        return callback(null, true);
       }
+      
+      // 3. 🔥 FIX: Dynamic check to allow ANY Vercel branch/preview subdomains safely
+      if (origin.endsWith(".vercel.app")) {
+        return callback(null, true);
+      }
+      
+      // If it doesn't match any of the rules, block it securely
+      console.log(`⚠️ Blocked by CORS: ${origin}`);
+      return callback(new Error("Not allowed by CORS"));
     },
-    credentials: true, // Allows HTTP cookies or Authorization headers if needed
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+
 
 // Handling preflight requests globally
 app.options(/(.*)/, cors());
