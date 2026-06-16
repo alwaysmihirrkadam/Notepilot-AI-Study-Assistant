@@ -7,28 +7,24 @@ import MessageArea from "../components/MessageArea";
 import ChatInput from "../components/ChatInput";
 import { toast } from "react-toastify";
 import { FiMenu } from "react-icons/fi";
+
 const Chat = ({ sidebarOpen, setSidebarOpen }) => {
   const navigate = useNavigate();
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState(
-    JSON.parse(
-      localStorage.getItem(
-        "selectedDocument"
-      )
-    ) || null
+    JSON.parse(localStorage.getItem("selectedDocument")) || null
   );
   const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    const token =
-      localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
     if (!token) {
       navigate("/login");
     }
-  }, []);
+  }, [navigate]);
 
   const askQuestion = async () => {
     if (!question.trim()) return;
@@ -51,12 +47,13 @@ const Chat = ({ sidebarOpen, setSidebarOpen }) => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
+      
+      // 🔥 FIX: Adjusted endpoint layout string from /api/chat to /api/chat/ask
       const res = await axios.post(
-        `${API_URL}/api/chat`,
+        `${API_URL}/api/chat/ask`,
         {
           question: currentQuestion,
-          documentId:
-            selectedDocument.documentId,
+          documentId: selectedDocument.documentId,
         },
         {
           headers: {
@@ -70,13 +67,12 @@ const Chat = ({ sidebarOpen, setSidebarOpen }) => {
         {
           role: "assistant",
           text: res.data.answer,
-          sources:
-            res.data.sources || [],
+          // Bypassing source tracking since Gemini reads the entire document at once natively!
+          sources: res.data.sources || [], 
         },
       ]);
 
     } catch (error) {
-
       setMessages((prev) => [
         ...prev,
         {
@@ -88,7 +84,6 @@ const Chat = ({ sidebarOpen, setSidebarOpen }) => {
             "Something went wrong",
         },
       ]);
-
     } finally {
       setLoading(false);
     }
@@ -97,20 +92,14 @@ const Chat = ({ sidebarOpen, setSidebarOpen }) => {
   return (
     <div className="flex mt-14 h-[calc(100vh-56px)] bg-slate-950 overflow-hidden relative">
       <Sidebar
-        selectedDocument={
-          selectedDocument
-        }
-        setSelectedDocument={
-          setSelectedDocument
-        }
+        selectedDocument={selectedDocument}
+        setSelectedDocument={setSelectedDocument}
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
       />
 
       <div className="flex-1 flex flex-col text-white min-h-0">
-        <MessageArea
-          messages={messages}
-        />
+        <MessageArea messages={messages} />
 
         <ChatInput
           question={question}
@@ -118,9 +107,7 @@ const Chat = ({ sidebarOpen, setSidebarOpen }) => {
           askQuestion={askQuestion}
           loading={loading}
         />
-
       </div>
-
     </div>
   );
 };
