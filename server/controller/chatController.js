@@ -12,10 +12,9 @@ export const askQuestion = async (req, res) => {
       });
     }
 
-    const collection =
-      await client.getCollection({
-        name: "study-notes",
-      });
+    const collection = await client.getCollection({
+      name: "study-notes",
+    });
 
     const questionEmbedding = await generateEmbedding(question);
 

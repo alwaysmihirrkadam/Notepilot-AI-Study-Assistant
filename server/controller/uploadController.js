@@ -43,11 +43,9 @@ export const uploadPDF = async (req, res) => {
 
     const documentId = randomUUID();
 
-    const collection =
-      await client.getOrCreateCollection({
-        name: "study-notes",
-        metadata: {},
-      });
+    const collection = await client.getOrCreateCollection({
+      name: "study-notes",
+    });
 
 
     const userId = req.user.id;
