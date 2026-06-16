@@ -52,25 +52,17 @@ export const uploadPDF = async (req, res) => {
     const filename = req.file.originalname;
 
     for (let i = 0; i < chunks.length; i++) {
-      const embedding =
-        await generateEmbedding(
-          chunks[i].pageContent
-        );
+      const embedding = await generateEmbedding(chunks[i].pageContent);
 
       await collection.add({
         ids: [`chunk-${documentId}-${i}`],
-
         embeddings: [embedding],
-
-        documents: [
-          chunks[i].pageContent,
-        ],
-
+        documents: [chunks[i].pageContent],
         metadatas: [
           {
-            source: filename,
-            documentId,
-            userId,
+            source: String(filename),
+            documentId: String(documentId),
+            userId: String(userId), // Forces it to be a strict flat string
           },
         ],
       });
