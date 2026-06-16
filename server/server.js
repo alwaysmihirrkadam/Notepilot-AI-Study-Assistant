@@ -9,46 +9,51 @@ import userRoute from './routes/userRoute.js';
 
 dotenv.config();
 
-// 🔥 CRITICAL FIX: Initialize your Express application here!
 const app = express();
 
+// ==========================================
+// 🔥 FOOLPROOF CORS & PREFLIGHT CONTROLLER
+// ==========================================
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:3000",
-  "https://notepilot-ai-study-assistant.vercel.app"
-];
-
+// 1. Apply the standard cors middleware globally with flexible allowed origins
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // 1. Allow requests with no origin (like mobile apps or Postman)
-      if (!origin) return callback(null, true);
-      
-      // 2. Allow if it matches our exact hardcoded production origins list
-      if (allowedOrigins.indexOf(origin) !== -1) {
-        return callback(null, true);
-      }
-      
-      // 3. 🔥 FIX: Dynamic check to allow ANY Vercel branch/preview subdomains safely
-      if (origin.endsWith(".vercel.app")) {
-        return callback(null, true);
-      }
-      
-      // If it doesn't match any of the rules, block it securely
-      console.log(`⚠️ Blocked by CORS: ${origin}`);
-      return callback(new Error("Not allowed by CORS"));
-    },
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "https://notepilot-ai-study-assistant.vercel.app"
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization"]
   })
 );
 
+// 2. Heavy-duty custom middleware to intercept preflights and force headers
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  
+  // Natively intercept the active Vercel production and preview subdomains
+  if (origin && (origin === "https://notepilot-ai-study-assistant.vercel.app" || origin.endsWith(".vercel.app") || origin.startsWith("http://localhost"))) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+  
+  res.setHeader("Access-Control-Allow-Methods", "GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
 
+  // If the browser sends an OPTIONS preflight request, reply instantly with 200 OK!
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  
+  next();
+});
 
-// Handling preflight requests globally
-app.options(/(.*)/, cors());
+// ==========================================
+// STANDARD APPLICATION ROUTING CONFIGURATION
+// ==========================================
+
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -66,7 +71,6 @@ const port = process.env.PORT || 10000;
 const startServer = async () => {
   try {
     await connectDB();
-    // 💡 FIX: Added '0.0.0.0' to ensure flawless container binding on Render
     app.listen(port, '0.0.0.0', () => {
       console.log(`Server running securely on port ${port}`);
     });
