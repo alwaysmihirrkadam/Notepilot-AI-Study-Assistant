@@ -90,7 +90,7 @@ const Chat = ({ sidebarOpen, setSidebarOpen }) => {
   };
 
   return (
-    <div className="flex mt-14 h-[calc(100vh-56px)] bg-slate-950 overflow-hidden relative">
+    <div className="flex mt-14 h-[calc(100dvh-56px)] bg-slate-950 overflow-hidden relative">
       <Sidebar
         selectedDocument={selectedDocument}
         setSelectedDocument={setSelectedDocument}
@@ -98,7 +98,7 @@ const Chat = ({ sidebarOpen, setSidebarOpen }) => {
         setSidebarOpen={setSidebarOpen}
       />
 
-      <div className="flex-1 flex flex-col text-white min-h-0">
+      <div className="flex-1 flex flex-col text-white min-h-0 overflow-hidden">
         <MessageArea messages={messages} />
 
         <ChatInput
