@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import UploadPDF from "./pages/UploadPDF";
 import Chat from "./pages/Chat";
 import RegisterModal from "./components/RegisterModel";
@@ -14,11 +14,23 @@ function App() {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const API_URL = import.meta.env.VITE_API_URL;
-  console.log(API_URL)
+  
+  const location = useLocation();
+
+  const hideNavbarRoutes = [
+    "/",
+    "/login",
+    "/register",
+  ];
+
+  const showNavbar =
+    !hideNavbarRoutes.includes(
+      location.pathname
+    );
 
   return (
     <BrowserRouter>
-      <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      {showNavbar && <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />}
       <Routes>
         {/* Core Pages */}
         <Route path="/login" element={<LoginModal />} />
