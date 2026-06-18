@@ -31,7 +31,7 @@ const LoginModal = () => {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4">
-      <div className="w-full max-w-md bg-slate-900 p-6 rounded-xl shadow-xl">
+      <div className="w-full max-w-md bg-slate-900 p-6 rounded-xl shadow-xl text-white">
         <h2 className="text-2xl font-bold mb-4">Login</h2>
 
         <input
