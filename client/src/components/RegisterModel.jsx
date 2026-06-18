@@ -6,21 +6,28 @@ import { toast } from "react-toastify";
 const RegisterModal = () => {
     const [registerForm, setRegisterForm] = useState({ name: "", email: "", password: "" });
     const navigate = useNavigate()
+    const [loading, setLoading] = useState(false);
     const API_URL = import.meta.env.VITE_API_URL;
-    console.log(API_URL)
 
     const registerHandler = async () => {
+        if (loading) return;
+
         try {
-            // Fixed: Removed the outer curly braces around loginForm
-            const res = await axios.post(`${API_URL}/api/auth/register`, registerForm);
+            setLoading(true);
+            const res = await axios.post(
+                `${API_URL}/api/auth/register`,
+                registerForm
+            );
             localStorage.setItem("token", res.data.token);
-            toast.success("Registration successfully");
+            toast.success("Registration successful");
             navigate("/upload");
         } catch (error) {
             toast.error(
                 error.response?.data?.message ||
                 "Registration failed"
             );
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -32,9 +39,8 @@ const RegisterModal = () => {
     }
 
     return (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 overflow-y-auto">
-            <div className="w-full max-w-md bg-slate-900 text-white p-6 rounded-xl shadow-xl">
-
+        <div className="fixed inset-0 bg-black/60 flex items-start md:items-center justify-center z-50 px-4 pt-10 md:pt-0 overflow-y-auto">
+            <div className="w-full max-w-md bg-slate-900 p-6 rounded-xl shadow-xl text-white my-6">
                 <h2 className="text-2xl font-bold mb-6 text-center">
                     Register
                 </h2>
