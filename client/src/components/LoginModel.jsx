@@ -5,20 +5,28 @@ import { toast } from "react-toastify";
 
 const LoginModal = () => {
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
 
   const loginHandler = async () => {
+    if (loading) return;
     try {
-      // Fixed: Removed the outer curly braces around loginForm
-      const res = await axios.post(`https://notepilot-ai-study-assistant-1.onrender.com/api/auth/login`, loginForm);
+      setLoading(true);
+      const res = await axios.post(
+        `${API_URL}/api/auth/login`,
+        loginForm
+      );
       localStorage.setItem("token", res.data.token);
-      toast.success("Log in successfully");
+      toast.success("Logged in successfully");
       navigate("/upload");
     } catch (error) {
       toast.error(
-        error.response?.data?.message || "Login failed"
+        error.response?.data?.message ||
+        "Login failed"
       );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -53,9 +61,10 @@ const LoginModal = () => {
         />
         <button
           onClick={loginHandler}
-          className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
+          disabled={loading}
+          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white py-3 rounded-lg transition"
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
         </button>
 
         {/* FIX 3: Close modal on navigation */}
