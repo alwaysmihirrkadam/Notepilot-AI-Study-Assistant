@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import UploadPDF from "./pages/UploadPDF";
 import Chat from "./pages/Chat";
 import RegisterModal from "./components/RegisterModel";
@@ -13,7 +13,6 @@ function App() {
   const isAuthenticated = !!localStorage.getItem("token");
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const API_URL = import.meta.env.VITE_API_URL;
   
   const location = useLocation();
 
@@ -29,7 +28,7 @@ function App() {
     );
 
   return (
-    <BrowserRouter>
+    <>
       {showNavbar && <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />}
       <Routes>
         {/* Core Pages */}
@@ -49,7 +48,7 @@ function App() {
         autoClose={3000}
         theme="dark"
       />
-    </BrowserRouter>
+    </>
   );
 }
 
