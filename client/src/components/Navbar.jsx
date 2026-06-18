@@ -7,7 +7,7 @@ import { FiMenu } from "react-icons/fi";
 
 const Navbar = ({ setSidebarOpen }) => {
   const navigate = useNavigate();
-  const [user, setUser] = useState([])
+  const [user, setUser] = useState(null)
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
   const API_URL = import.meta.env.VITE_API_URL;
@@ -22,13 +22,17 @@ const Navbar = ({ setSidebarOpen }) => {
       });
       setUser(res.data.user)
     } catch (error) {
-      toast.error("Failed to fetch user details:", error);
+      if (error.response?.status !== 401) {
+        console.error(error);
+      }
     }
   }
 
   useEffect(() => {
-    userDetails()
-  }, [])
+    if (localStorage.getItem("token")) {
+      userDetails();
+    }
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
